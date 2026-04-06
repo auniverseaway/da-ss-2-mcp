@@ -61,16 +61,19 @@ jobs:
             -- "You have access to an MCP server called da-aem for authoring content on an AEM Edge Delivery Services site.
 
           Your task: Create a blog post about a city that has NOT been previously covered.
-          Target site: https://main--author-kit--aemsites.aem.live/blog
+
+          IMPORTANT path mapping: The DA (Document Authoring) path for this site is /aemsites/author-kit/blog.
+          The published site is https://main--author-kit--aemsites.aem.live/blog.
+          All DA MCP operations (list, write, etc.) must use the DA path: /aemsites/author-kit/blog/<city-name-slug>
 
           Instructions:
-          1. First, use the da-aem MCP tools to check what blog posts already exist under /blog to avoid duplicating a city.
+          1. First, use the da-aem MCP tools to list what exists under /aemsites/author-kit/blog to see which cities have already been covered. Avoid duplicating a city.
           2. Pick an interesting city from anywhere in the world that hasn't been covered yet.
-          3. Write an engaging, informative blog post about the city covering:
+          3. Write an engaging, informative blog post about the city. The blog post MUST start with a hero image at the top — use a publicly available image URL from Unsplash or Wikimedia Commons showing the city skyline or a famous landmark. Then cover:
              - A brief history
              - Top attractions and things to do
              - Local food and culture
              - Best time to visit
              - Practical travel tips
-          4. Use the da-aem MCP tools to create the blog post at the path /blog/<city-name-slug>
-          5. Confirm the post was created successfully."
+          4. Use the da-aem MCP tools to create the blog post at the DA path /aemsites/author-kit/blog/<city-name-slug>
+          5. Confirm the post was created successfully and will be viewable at https://main--author-kit--aemsites.aem.live/blog/<city-name-slug>"
