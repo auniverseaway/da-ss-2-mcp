@@ -1,0 +1,68 @@
+name: Generate City Blog Post
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'  # Every 12 hours
+  workflow_dispatch: {}       # Manual trigger
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  create-blog-post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch Adobe IMS token
+        id: auth
+        run: |
+          TOKEN=$(curl -s -X POST 'https://ims-na1.adobelogin.com/ims/token/v3' \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            -d "grant_type=client_credentials" \
+            -d "client_id=${{ secrets.ADOBE_CLIENT_ID }}" \
+            -d "client_secret=${{ secrets.ADOBE_CLIENT_SECRET }}" \
+            -d "scope=openid,AdobeID,read_organizations,aem.frontend.all,additional_info.projectedProductContext" \
+            | jq -r '.access_token')
+          if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
+            echo "::error::Failed to fetch Adobe IMS token"
+            exit 1
+          fi
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Generate blog post
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          direct_prompt: |
+            You have access to an MCP server for authoring content on an AEM Edge Delivery Services site.
+
+            Your task: Create a blog post about a city that has NOT been previously covered.
+            Target site: https://main--author-kit--aemsites.aem.live/blog
+
+            Instructions:
+            1. First, check what blog posts already exist under /blog to avoid duplicating a city.
+            2. Pick an interesting city from anywhere in the world that hasn't been covered yet.
+            3. Write an engaging, informative blog post about the city covering:
+               - A brief history
+               - Top attractions and things to do
+               - Local food and culture
+               - Best time to visit
+               - Practical travel tips
+            4. Create the blog post at the path /blog/<city-name-slug>
+            5. Confirm the post was created successfully.
+          mcp_config: |
+            {
+              "mcpServers": {
+                "da-aem": {
+                  "url": "https://da-mcp.adobeaem.workers.dev/mcp",
+                  "headers": {
+                    "Authorization": "Bearer ${{ steps.auth.outputs.token }}"
+                  }
+                }
+              }
+            }
