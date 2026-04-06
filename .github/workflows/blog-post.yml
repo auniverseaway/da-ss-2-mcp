@@ -30,21 +30,22 @@ jobs:
           echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
 
       - name: Write MCP config
+        env:
+          DA_TOKEN: ${{ steps.auth.outputs.token }}
         run: |
-          cat > /tmp/mcp.json << ENDOFCONFIG
-          {
-            "mcpServers": {
+          jq -n --arg token "$DA_TOKEN" '{
+            mcpServers: {
               "da-aem": {
-                "type": "http",
-                "url": "https://da-mcp.adobeaem.workers.dev/mcp",
-                "headers": {
-                  "Authorization": "Bearer ${{ steps.auth.outputs.token }}"
+                type: "http",
+                url: "https://da-mcp.adobeaem.workers.dev/mcp",
+                headers: {
+                  Authorization: ("Bearer " + $token)
                 }
               }
             }
-          }
-          ENDOFCONFIG
-          cat /tmp/mcp.json
+          }' > /tmp/mcp.json
+          echo "MCP config written:"
+          jq '.mcpServers["da-aem"] | {type, url, has_auth: (.headers.Authorization | length > 0)}' /tmp/mcp.json
 
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
