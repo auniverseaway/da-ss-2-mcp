@@ -56,6 +56,7 @@ jobs:
         run: |
           claude -p \
             --mcp-config /tmp/mcp.json \
+            --strict-mcp-config \
             --allowedTools 'mcp__da-aem__*' \
             -- "You have access to an MCP server called da-aem for authoring content on an AEM Edge Delivery Services site.
 
