@@ -29,6 +29,23 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
 
+      - name: Write MCP config
+        run: |
+          cat > /tmp/mcp.json << ENDOFCONFIG
+          {
+            "mcpServers": {
+              "da-aem": {
+                "type": "url",
+                "url": "https://da-mcp.adobeaem.workers.dev/mcp",
+                "headers": {
+                  "Authorization": "Bearer ${{ steps.auth.outputs.token }}"
+                }
+              }
+            }
+          }
+          ENDOFCONFIG
+          cat /tmp/mcp.json
+
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
 
@@ -37,7 +54,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           claude -p \
-            --mcp-config '{"mcpServers":{"da-aem":{"url":"https://da-mcp.adobeaem.workers.dev/mcp","headers":{"Authorization":"Bearer ${{ steps.auth.outputs.token }}"}}}}' \
+            --mcp-config /tmp/mcp.json \
             --allowedTools 'mcp__da-aem__*' \
             "You have access to an MCP server called da-aem for authoring content on an AEM Edge Delivery Services site.
 
