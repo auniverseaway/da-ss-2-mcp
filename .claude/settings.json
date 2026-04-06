@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "da-aem": {
+      "url": "https://da-mcp.adobeaem.workers.dev/mcp"
+    }
+  }
+}
