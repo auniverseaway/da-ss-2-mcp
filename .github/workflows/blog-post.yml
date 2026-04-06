@@ -35,7 +35,7 @@ jobs:
           {
             "mcpServers": {
               "da-aem": {
-                "type": "url",
+                "type": "http",
                 "url": "https://da-mcp.adobeaem.workers.dev/mcp",
                 "headers": {
                   "Authorization": "Bearer ${{ steps.auth.outputs.token }}"
@@ -56,7 +56,7 @@ jobs:
           claude -p \
             --mcp-config /tmp/mcp.json \
             --allowedTools 'mcp__da-aem__*' \
-            "You have access to an MCP server called da-aem for authoring content on an AEM Edge Delivery Services site.
+            -- "You have access to an MCP server called da-aem for authoring content on an AEM Edge Delivery Services site.
 
           Your task: Create a blog post about a city that has NOT been previously covered.
           Target site: https://main--author-kit--aemsites.aem.live/blog
